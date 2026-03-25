@@ -38,7 +38,7 @@ def split_file_to_chunks(file_path):
     loader = PyPDFLoader(file_path)#creating the object of class PyPDFLoader through which python can read
     document = loader.load()
     text_splitter = RecursiveCharacterTextSplitter(
-        chunk_size=500, chunk_overlap=50)#object of class RecursiveCharacterTextSplitter with size 500,overlap with 50
+        chunk_size=650, chunk_overlap=50)#object of class RecursiveCharacterTextSplitter with size 500,overlap with 50
     chunks = text_splitter.split_documents(documents=document)#here splitting is taking place
     return chunks
 

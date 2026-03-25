@@ -21,10 +21,11 @@ def do_rag_generation(search_request: Request,history) -> Response:
     # 1. Retrieve docs
     context_docs = vector_store.similarity_search_with_relevance_scores(query, k=5)
     print(context_docs[0][1])
-    if len(context_docs) == 0 or context_docs[0][1] < 0.8:
+    if len(context_docs) == 0 or context_docs[0][1] < 0.5:
         print("unable to find matching results.:(")
         return
-    docs_content = "\n\n".join(doc.page_content for doc in context_docs)
+    print(context_docs)
+    docs_content = "\n\n".join(doc.page_content for doc,score in context_docs)
     final_context = f"Conversation History:\n{history}\n\nKnowledge Base:\n{docs_content}"
     # 2. Create prompt
     message = prompt.invoke({
@@ -57,7 +58,7 @@ def do_rag_generation(search_request: Request,history) -> Response:
     response.summary = getattr(llm_response, "text", str(llm_response))
     response.sources = [
         doc.page_content + "\t" + json.dumps(doc.metadata)
-        for doc in context_docs
+        for doc,score in context_docs
     ]
     
     return response

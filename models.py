@@ -24,20 +24,7 @@ def load_translation_model():
     return translation_tokenizer, translation_model 
 # ##
 
-# response = model.models.generate_content(
-#     model="gemini-1.5-flash",
-#     contents=message.to_messages()[0].content,
-# )
 
-# return response.text
-# ###
-# def init_llm_model(api_key=None):
-#     if api_key is None:
-#         raise ValueError("API Key is required")
-
-#     genai.configure(api_key=api_key)
-#     model = genai.GenerativeModel("gemini-1.5-flash")
-#     return model
 
 def init_llm_model(api_key=None):
     if api_key is None:
@@ -48,7 +35,7 @@ def init_llm_model(api_key=None):
 
 def embedding_model():
     return HuggingFaceEmbeddings(
-        model_name="all-MiniLM-L6-v2",
+        model_name="all-MiniLM-L6-v2",#"all-mpnet-base-v2"
         model_kwargs={"device": "cpu"}
     )
   
