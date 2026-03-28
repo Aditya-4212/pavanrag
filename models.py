@@ -7,21 +7,21 @@ from google import genai
 from langchain_community.vectorstores import FAISS
 #from langchain.embeddings import HuggingFaceEmbeddings
 from langchain_community.embeddings import HuggingFaceEmbeddings
-translation_model = None
-translation_tokenizer = None
+# translation_model = None
+# translation_tokenizer = None
 
-def load_translation_model():
-    global translation_model, translation_tokenizer
+# def load_translation_model():
+#     global translation_model, translation_tokenizer
 
-    if translation_model is None:
-        from transformers import MarianMTModel, MarianTokenizer
+#     if translation_model is None:
+#         from transformers import MarianMTModel, MarianTokenizer
 
-        model_name = "Helsinki-NLP/opus-mt-en-hi"
+#         model_name = "Helsinki-NLP/opus-mt-en-hi"
 
-        translation_tokenizer = MarianTokenizer.from_pretrained(model_name)
-        translation_model = MarianMTModel.from_pretrained(model_name)
+#         translation_tokenizer = MarianTokenizer.from_pretrained(model_name)
+#         translation_model = MarianMTModel.from_pretrained(model_name)
 
-    return translation_tokenizer, translation_model 
+#     return translation_tokenizer, translation_model 
 # ##
 
 
@@ -39,13 +39,13 @@ def embedding_model():
         model_kwargs={"device": "cpu"}
     )
   
-def eng_hindi(text):
-    tokenizer, model = load_translation_model()
-    tokens = tokenizer(text, return_tensors="pt", padding=True)                 
-    translated = model.generate(**tokens)
-    output = tokenizer.decode(translated[0], skip_special_tokens=True)
+# def eng_hindi(text):
+#     tokenizer, model = load_translation_model()
+#     tokens = tokenizer(text, return_tensors="pt", padding=True)                 
+#     translated = model.generate(**tokens)
+#     output = tokenizer.decode(translated[0], skip_special_tokens=True)
 
-    return output
+#     return output
 
 def load_index(filename, force_rebuild_index=False):
     if force_rebuild_index or not os.path.exists(filename):

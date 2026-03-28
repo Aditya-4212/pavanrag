@@ -2,7 +2,7 @@ import os
 import json
 import traceback
 from req_res import Request, Response
-from models import load_index, init_llm_model,eng_hindi
+from models import load_index, init_llm_model#,eng_hindi
 from langchain import hub
 from dotenv import load_dotenv
 load_dotenv()
@@ -21,9 +21,21 @@ def do_rag_generation(search_request: Request,history) -> Response:
     # 1. Retrieve docs
     context_docs = vector_store.similarity_search_with_relevance_scores(query, k=5)
     print(context_docs[0][1])
+    relevant_count = 0
+
+    for doc, score in context_docs:
+        text = doc.page_content.lower()
+        if any(word in text for word in query.lower().split()):
+            relevant_count += 1
+    precision_at_k = relevant_count / len(context_docs)
+
+    print("Precision@k:", precision_at_k)
     if len(context_docs) == 0 or context_docs[0][1] < 0.5:
         print("unable to find matching results.:(")
         return
+    
+    #Precision_k = Relevant Retrieved Docs / k
+    #Precision_k =  / k
     print(context_docs)
     docs_content = "\n\n".join(doc.page_content for doc,score in context_docs)
     final_context = f"Conversation History:\n{history}\n\nKnowledge Base:\n{docs_content}"
@@ -41,8 +53,8 @@ def do_rag_generation(search_request: Request,history) -> Response:
     You are AI Assistant for helping users with making them explaining Rama katha rasavahini.
 
     Rules:
-    - Detect greetings (e.g., ‘hi’, ‘hello’). If detected, return a greeting response
-    - Give answers in bullet points
+    - Detect greetings (e.g., hi, hello). If detected, return a greeting response
+    - Give answers in bullet points and Use little longer explanations
     - If the query involves a relationship, then output all possible relationships along with their corresponding names. 
     - Only use the provided context 
     - If the answer is not in the context, say "I don't know"

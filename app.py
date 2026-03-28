@@ -14,9 +14,9 @@ if st.button("ENGLISH"):
     st.session_state.selected = "ENGLISH"
     st.write("ENGLISH SELECTED!")
 
-if st.button("Hindi"):
-    st.session_state.selected = "Hindi"
-    st.write("HINDI SELECTED!")
+# if st.button("Hindi"):
+#     st.session_state.selected = "Hindi"
+#     st.write("HINDI SELECTED!")
 
 if "messages" not in st.session_state:
     st.session_state.messages = []
@@ -25,7 +25,7 @@ user_input = st.chat_input("Ask your question")
 if user_input:
         st.session_state.messages.append({"role": "user", "content": user_input})
         recent_history=st.session_state.messages[-12:]
-        with st.spinner("Searching Rama_katha_rasa_vahini documents..."):
+        with st.spinner(f"{user_input}..."):
             # answers= get_answer(user_input,recent_history)
             # print(answers)
             # answer=answers[1]
