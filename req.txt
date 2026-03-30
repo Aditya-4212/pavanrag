@@ -13,3 +13,4 @@ google
 google-genai
 sentencepiece
 streamlit
+langchain-google-genai google-generativeai

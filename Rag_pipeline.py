@@ -13,23 +13,32 @@ if not API_KEY:
 
 model = init_llm_model(API_KEY)
 
+folder_path = "Rama_katha_rasa_vahini"
+
+pdf_files = [
+    os.path.join(folder_path, file)
+    for file in os.listdir(folder_path)
+    if file.endswith(".pdf")
+]
+
+hyde_ret = HyDERetriever(pdf_files)
 INDEX_FILE = "./data/vector_store.pkl"
 prompt = hub.pull("rlm/rag-prompt")
 def do_rag_generation(search_request: Request,history) -> Response:
     query = search_request.query
-    
+    context_docs, hypothetical_doc = hyde_ret.retrieve(query)
     # 1. Retrieve docs
-    context_docs = vector_store.similarity_search_with_relevance_scores(query, k=5)
+    #context_docs = vector_store.similarity_search_with_relevance_scores(query, k=5)
     print(context_docs[0][1])
-    relevant_count = 0
+    # relevant_count = 0
 
-    for doc, score in context_docs:
-        text = doc.page_content.lower()
-        if any(word in text for word in query.lower().split()):
-            relevant_count += 1
-    precision_at_k = relevant_count / len(context_docs)
+    # for doc, score in context_docs:
+    #     text = doc.page_content.lower()
+    #     if any(word in text for word in query.lower().split()):
+    #         relevant_count += 1
+    # precision_at_k = relevant_count / len(context_docs)
 
-    print("Precision@k:", precision_at_k)
+    # print("Precision@k:", precision_at_k)
     if len(context_docs) == 0 or context_docs[0][1] < 0.5:
         print("unable to find matching results.:(")
         return
