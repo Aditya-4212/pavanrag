@@ -8,24 +8,7 @@ from langchain_community.vectorstores import FAISS
 #from langchain.embeddings import HuggingFaceEmbeddings
 from langchain_community.embeddings import HuggingFaceEmbeddings
 from langchain_google_genai import ChatGoogleGenerativeAI
-# translation_model = None
-# translation_tokenizer = None
-
-# def load_translation_model():
-#     global translation_model, translation_tokenizer
-
-#     if translation_model is None:
-#         from transformers import MarianMTModel, MarianTokenizer
-
-#         model_name = "Helsinki-NLP/opus-mt-en-hi"
-
-#         translation_tokenizer = MarianTokenizer.from_pretrained(model_name)
-#         translation_model = MarianMTModel.from_pretrained(model_name)
-
-#     return translation_tokenizer, translation_model 
-# ##
-
-
+from langchain.prompts import PromptTemplate
 
 def init_llm_model(api_key=None):
     if api_key is None:
@@ -40,13 +23,7 @@ def embedding_model():
         model_kwargs={"device": "cpu"}
     )
   
-# def eng_hindi(text):
-#     tokenizer, model = load_translation_model()
-#     tokens = tokenizer(text, return_tensors="pt", padding=True)                 
-#     translated = model.generate(**tokens)
-#     output = tokenizer.decode(translated[0], skip_special_tokens=True)
 
-#     return output
 
 def load_index(filename, force_rebuild_index=False):
     if force_rebuild_index or not os.path.exists(filename):
@@ -64,19 +41,36 @@ def load_index(filename, force_rebuild_index=False):
 
 
 class HyDERetriever:
-    def __init__(self, file_path, chunk_size=500, chunk_overlap=100):
-        self.llm =ChatGoogleGenerativeAI(model="gemini-1.5-flash",temperature=0)
+    def __init__(self, file_path, API_KEY2 , chunk_size=500, chunk_overlap=100 ):
+        self.llm =ChatGoogleGenerativeAI(model="gemini-2.5-flash",temperature=0 , google_api_key=API_KEY2)
 
         self.embeddings = embedding_model()
         self.chunk_size = chunk_size
         self.chunk_overlap = chunk_overlap
-        self.vectorstore = encode_pdf(file_path, chunk_size=self.chunk_size, chunk_overlap=self.chunk_overlap)
+        with open("data/vector_store.pkl", "rb") as f:
+            self.vector_store = pickle.load(f)
+       # self.vectorstore = encode_pdf(file_path, chunk_size=self.chunk_size, chunk_overlap=self.chunk_overlap)
     
         
         self.hyde_prompt = PromptTemplate(
             input_variables=["query", "chunk_size"],
-            template="""Given the question '{query}', generate a hypothetical document that directly answers this question. The document should be detailed and in-depth.
-            the document size has be exactly {chunk_size} characters.""",
+            template = """
+You are generating a hypothetical document for retrieval (HyDE step).
+
+Given the question:
+{query}
+
+Generate a detailed, clear, and structured explanation that directly answers the question based ONLY on general knowledge of the Ramayana.
+
+Rules:
+- Be factual and deterministic (no creativity, no storytelling style).
+- Focus on key concepts, roles, and relationships.
+- Do NOT add imaginary or poetic content.
+- Keep the tone informational (like a textbook explanation).
+- Ensure the content is relevant for semantic search.
+
+The document should be approximately {chunk_size} characters long.
+"""
         )
         self.hyde_chain = self.hyde_prompt | self.llm
 

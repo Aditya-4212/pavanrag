@@ -3,8 +3,8 @@ from Rag_pipeline import get_answer
 # def get_answer(question):
 #     answer = Rag_pipeline(question)
 #     return answer
-
-st.title("Rama_katha_rasa_vahini chatbot")
+#st.title("Rama_katha_rasa_vahini chatbot")
+st.title("chatbot")
 st.write("Welcome to Rama_katha_rasa_vahini")
 #st.header("Header Example")
 if "selected" not in st.session_state:
